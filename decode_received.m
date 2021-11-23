@@ -1,4 +1,4 @@
-% Matched filter
+%% Load parameters and signals
 params;
 
 transmitsignal = load('transmitsignal.mat');
@@ -7,18 +7,14 @@ xt = transmitsignal.transmitsignal;
 yt = receivedsignal.receivedsignal;
 lenyt = length(yt);
 
-wt = flipud(pt); 
-
+%% Recover bits
 % Filter with matched filter
+wt = flipud(pt); 
 zt = conv(wt,yt)*(1/fs); % '1/fs' simply serves as 'delta' to approximate integral as sum 
 lenzt = length(zt);
 
 % timing offset + rotation
-[corrs,lags] = xcorr(zt,timingSignal); % pilot upsampled
-[~,I] = max(abs(corrs));
-theta = angle(corrs(I));
-tau = lags(I);
-
+[tau, theta] = timing_sync(zt);
 timing_yt = yt(tau+1:fs:end);
 
 % Sample signal after timing preamble
@@ -26,28 +22,11 @@ zk = zt(tau+length(timingSignal)+1:fs:end);
 zk = zk(1:LL-freqT-timingT+1);
 
 % Sample pilots and equalize
-pilotSignal = conv(pilotUp,pt,'same');
-pk = pilotSignal(1:fs:end);
-zk_full_eq = [];
-vk = [];
-for i=1:num_packets
-    if length(zk(packetLen*(i-1)+1:end)) > packetLen
-        zk_packet = zk(packetLen*(i-1)+1:packetLen*i);
-    else
-        zk_packet = zk(packetLen*(i-1)+1:end-1);
-    end
+[vk, zk_full_eq] = one_tap_equalize(zk);
 
-    pk_hat = zk_packet(1:pilotT);
-    zk_message = zk_packet(pilotT+1:end);
-    eq = (pk_hat.' * pk)/ (pk' * pk);
-    zk_full_eq = [zk_full_eq; zk_packet/eq];
-    vk = [vk; zk_message/eq];
-end
-
-% **********************************************************
+%% Plot Original and Recovered Images
 % Final recovered bits and image
-xk_hat = sign(real(vk));
-bits_hat = (xk_hat>=0);
+bits_hat = qamdemod(vk, M, 'OutputType','bit');
 fprintf('BER: %f\n', sum(bits_hat~=bits)/length(bits));
 fprintf('Number of Incorrect Bits: %d\n', sum(bits_hat ~= bits))
 
@@ -60,7 +39,7 @@ im_hat = reshape(bits_hat, h, w);
 imshow(im_hat);
 title('Recovered Image')
 
-% **********************************************************
+%% Plot Signals
 % Plot time domain signals
 figure('Name', 'Receiver Time Signals');
 clf
