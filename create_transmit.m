@@ -3,21 +3,27 @@
 params;
 
 % BPSK mapping to symbols
-xk_symbs = encode_bits(bits, B)*sqrt(Ex);
+xk_symbs = encode_bits(bits, B);
 
 % Create baseband signal with pilots inserted every packetT symbols
+
 extra = mod(length(xk_symbs),packetT);
 xk_ps = xk_symbs(1:end-extra);
 xk_ps = reshape(xk_ps.', packetT, []);
 pilots = repmat(pilotSymbs, 1, size(xk_ps, 2));
 xk_ps = cat(1, xk_ps, pilots);
 xk_ps = xk_ps(:);
-xk_symbs = [xk_ps; xk_symbs(end-extra+1:end)];
+if extra > 0
+    xk_symbs = [xk_ps; xk_symbs(end-extra+1:end)];
+else
+    xk_symbs = xk_ps(1:end-pilotT);
+end
+
 xk_up = upsample(xk_symbs, fs);
 
 full_xk_up = [freqUp; timingUp; pilotUp; xk_up];
 xt = conv(full_xk_up,pt);
-xt = xt/abs(max(xt));
+xt = xt/(max(abs(xt)));
 lenxt = length(xt);
 
 %% **********************************************************

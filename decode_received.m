@@ -18,7 +18,7 @@ lenzt = length(zt);
 timing_yt = yt(tau+1:fs:end);
 
 % Sample pilots and equalize
-if one_tap == 0
+if use_one_tap
     % Sample signal AFTER timing preamble
     zk = zt(tau+length(timingSignal)+1:fs:end);
     zk = zk(1:LL-freqT-timingT+1);
@@ -26,8 +26,8 @@ if one_tap == 0
 else
     % Sample signal starting at timing preamble
     zk = zt(tau+1:fs:end);
-    zk = zk(1:LL-freqT+1);
-    vk = mmse_le(zk(1:timingT+pilotT+packetT));
+    zk = zk(1:end-freqT+1);
+    vk = mmse_le(zk);
 end
 
 %% Plot Original and Recovered Images
