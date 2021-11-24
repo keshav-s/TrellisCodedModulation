@@ -17,23 +17,24 @@ xk_up = upsample(xk_symbs, fs);
 
 full_xk_up = [freqUp; timingUp; pilotUp; xk_up];
 xt = conv(full_xk_up,pt);
+xt = xt/abs(max(xt));
 lenxt = length(xt);
 
-% **********************************************************
+%% **********************************************************
 % Waveforms and spectra
 
 % Plot time domain signals
 ax = [];
-figure(1)
+figure('Name', 'Sent Time Signals')
 LargeFigure(gcf, 0.15); % Make figure large
 clf
 
-subplot(2,1,1);
+subplot(3,1,1);
 plot([-floor(Ns/2):Ns-floor(Ns/2)]/fsamp,pt)
 ylabel('p(t)')
 axis tight
 
-ax(1) = subplot(2,1,2);
+ax(1) = subplot(3,1,2);
 plot([0:lenxt-1]/fsamp,real(xt),'b')
 hold on
 plot([0:lenxt-1]/fsamp,imag(xt),'r')
@@ -42,6 +43,17 @@ legend('I','Q')
 ylabel('x(t)')
 xlabel('t in microseconds')
 zoom xon
+
+ax(1) = subplot(3,1,3);
+xt_sampled = xt(1:fs:end);
+plot(0:length(xt_sampled)-1, real(xt_sampled), 'b')
+hold on
+plot(0:length(xt_sampled)-1, imag(xt_sampled), 'r')
+axis('tight')
+legend('I','Q')
+ylabel('Sampled x(t)')
+zoom xon
+hold off
 
 % Plot frequency domain signals
 figure('Name', 'Transmitter Spectral Signals')
@@ -61,7 +73,7 @@ title('abs(X(f))')
 axis([-30 30 -100 20])
 figure(1)
 
-% **********************************************************
+%% **********************************************************
 % Save transmitsignal
 transmitsignal = xt;
 save transmitsignal transmitsignal

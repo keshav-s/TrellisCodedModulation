@@ -17,12 +17,18 @@ lenzt = length(zt);
 [tau, theta] = timing_sync(zt);
 timing_yt = yt(tau+1:fs:end);
 
-% Sample signal after timing preamble
-zk = zt(tau+length(timingSignal)+1:fs:end);
-zk = zk(1:LL-freqT-timingT+1);
-
 % Sample pilots and equalize
-[vk, zk_full_eq] = one_tap_equalize(zk);
+if one_tap == 0
+    % Sample signal AFTER timing preamble
+    zk = zt(tau+length(timingSignal)+1:fs:end);
+    zk = zk(1:LL-freqT-timingT+1);
+    [vk, zk_full_eq] = one_tap_equalize(zk);
+else
+    % Sample signal starting at timing preamble
+    zk = zt(tau+1:fs:end);
+    zk = zk(1:LL-freqT+1);
+    vk = mmse_le(zk(1:timingT+pilotT+packetT));
+end
 
 %% Plot Original and Recovered Images
 % Final recovered bits and image
@@ -32,7 +38,7 @@ fprintf('Number of Incorrect Bits: %d\n', sum(bits_hat ~= bits))
 
 
 subplot(1,2,1)
-imshow(imread('./images/shannon1440.bmp'));
+imshow(imread(img_path));
 title('Original Image')
 subplot(1,2,2);
 im_hat = reshape(bits_hat, h, w);
