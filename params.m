@@ -3,7 +3,7 @@
 % Create bits
 rng(0);
 
-img_path = ['images/shannon1440.bmp'];
+img_path = ['images/shannon20520.bmp'];
 bits = imread(img_path);
 [h,w] = size(bits);
 bits = bits(:);
@@ -13,7 +13,7 @@ use_one_tap = 0;
 B = 4;            % Bits per symbol
 M = 2^B;          % Symbol order
 rolloff = 0.2;    % Rolloff factor for SRRCR pulse
-freqT = 300;      % Number of symbol periods in the frequency preamble
+freqT = 200;      % Number of symbol periods in the frequency preamble
 timingT = 100;    % Number of symbol periods in the timing preamble
 fsamp = 200;      % Sampling frequency in MHz.  DON'T CHANGE
 N = 51;           % Length of filter in symbol periods. Default is 51
@@ -26,14 +26,14 @@ if use_one_tap
     LL = freqT + timingT + num_packets*pilotT + messageLen; % Total number of symbols
 else
     % MMSE LE Parameters
-    mmse_len = 8; % Number of taps in Practical MMSE-LE filter. Try 5
-    gammaMMSE = 0.08; % Step-size normalization constant of LMS algorithm. Try 0.01.  
-    num_train_epochs = 101; % Run over the same pilot sequence repeatedly this many times, to use the pilot more comprehensively
+    mmse_len = 5; % Number of taps in Practical MMSE-LE filter. Try 5
+    gammaMMSE = 0.18; % Step-size normalization constant of LMS algorithm. Try 0.01.  
+    num_train_epochs = 81; % Run over the same pilot sequence repeatedly this many times, to use the pilot more comprehensively
     mu_scaling = 0.98; % Reduce the mu by this factor each epoch
-    le_delay =  4; % To allow noncausal Practical MMSE-LE filter design, let filter predict a **past** symbol
+    le_delay =  2; % To allow noncausal Practical MMSE-LE filter design, let filter predict a **past** symbol
 
-    pilotT = 100;
-    num_segs = 2;
+    pilotT = 75;
+    num_segs = 15;
     packetT = messageLen/num_segs;    % Number of symbol periods in message between pilot inserts 
     packetLen = packetT + pilotT;
     if mod(messageLen,packetT) > 0

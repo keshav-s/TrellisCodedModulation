@@ -26,7 +26,6 @@ if use_one_tap
 else
     % Sample signal starting at timing preamble
     zk = zt(tau+1:fs:end);
-    zk = zk(1:end-freqT+1);
     vk = mmse_le(zk);
 end
 

@@ -20,9 +20,9 @@ else
 end
 
 xk_up = upsample(xk_symbs, fs);
-
 full_xk_up = [freqUp; timingUp; pilotUp; xk_up];
 xt = conv(full_xk_up,pt);
+xt_raw = conv(upsample(encode_bits(bits, B), fs), pt, 'same');
 xt = xt/(max(abs(xt)));
 lenxt = length(xt);
 
@@ -51,13 +51,13 @@ xlabel('t in microseconds')
 zoom xon
 
 ax(1) = subplot(3,1,3);
-xt_sampled = xt(1:fs:end);
+xt_sampled = xt_raw(1:fs:end);
 plot(0:length(xt_sampled)-1, real(xt_sampled), 'b')
 hold on
 plot(0:length(xt_sampled)-1, imag(xt_sampled), 'r')
 axis('tight')
 legend('I','Q')
-ylabel('Sampled x(t)')
+ylabel('Sampled x(t) without preambles and pilots')
 zoom xon
 hold off
 
