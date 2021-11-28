@@ -8,6 +8,7 @@ bits = imread(img_path);
 [h,w] = size(bits);
 bits = bits(:);
 use_one_tap = 0;
+coded = 1;
 
 % Message and System Parameters
 B = 4;            % Bits per symbol

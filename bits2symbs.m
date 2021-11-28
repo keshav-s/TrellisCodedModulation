@@ -1,4 +1,4 @@
-function xk_symbs = encode_bits(bits, B)
+function xk_symbs = bits2symbs(bits, B)
     bits = 1*bits;
     M = 2^B;
     data = bit2int(reshape(bits, B, []), B).';
