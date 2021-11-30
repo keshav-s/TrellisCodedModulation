@@ -25,7 +25,7 @@ end
 xk_up = upsample(xk_symbs, fs);
 full_xk_up = [freqUp; timingUp; pilotUp; xk_up];
 xt = conv(full_xk_up,pt);
-xt_raw = conv(upsample(bits2symbs(bits, 'QAM', B), fs), pt, 'same');
+xt_raw = conv(upsample(bits2symbs(bits, coded, B), fs), pt, 'same');
 xt = xt/(max(abs(xt)));
 lenxt = length(xt);
 

@@ -2,21 +2,27 @@
 
 % Create bits
 rng(0);
+coded = 0;
 
-img_path = ['images/shannon8208.bmp'];
+if coded
+    img_path = ['images/shannon10200.bmp'];
+else
+    img_path = ['images/shannon20520.bmp'];
+end
+
 bits = imread(img_path);
 [h,w] = size(bits);
 bits = bits(:);
 use_one_tap = 0;
-coded = 1;
 
 % Message and System Parameters
 pilotT = 73;
 if coded
     k = 2; % number of input bits for conv enc
-    B = 3; % number of past input bits stored in registers
+    n = 3; % number of output bits for conv enc
+    B = 3; % number of past i/p bits stored
     M = 2^B; % number of states
-    packetT = 158;
+    packetT = 232;
 
     zp_by = k*(B+1);
     messageLen = (length(bits)+zp_by)/k;
@@ -24,6 +30,7 @@ else
     B = 4;            % Bits per symbol
     M = 2^B;          % Symbol order
     packetT = 270;
+    messageLen = length(bits)/B;
 end
 packetLen = packetT + pilotT;
 rolloff = 0.2;    % Rolloff factor for SRRCR pulse
