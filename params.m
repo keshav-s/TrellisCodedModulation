@@ -24,6 +24,7 @@ if coded
     pilotT = 73;
     packetT = 232;
     N = 50; % Length of filter in symbol periods. Default is 51
+    fs = 11;
 
     zp_by = k*(B+1);
     messageLen = (length(bits)+zp_by)/k;
@@ -33,6 +34,9 @@ else
     pilotT = 50;
     packetT = 200;
     N = 51;
+    fs = 10;          % Over-sampling factor (Sampling frequency/symbol rate). Choose 20, so that 
+                  % symbol rate = sampling frequency/fs = 200/14 = 10 MHz.
+                  % fs is also the number of samples that make up one symbol period
     messageLen = length(bits)/B;
 end
 packetLen = packetT + pilotT;
@@ -58,9 +62,6 @@ mu_scaling = 0.99; % Reduce the mu by this factor each epoch
 f_delay =  2; % let filter predict a **past** symbol for practical feedforward adaptive filtering
 
 
-fs = 10;          % Over-sampling factor (Sampling frequency/symbol rate). Choose 20, so that 
-                  % symbol rate = sampling frequency/fs = 200/14 = 10 MHz.
-                  % fs is also the number of samples that make up one symbol period
 T = 1/(fsamp/fs); % Sampling period in microseconds
 Ns = floor(N*fs); % Number of filter samples
 
