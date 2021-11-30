@@ -32,7 +32,7 @@ end
 %% Plot Original and Recovered Images
 % Final recovered bits and image
 if coded
-    bits_hat = tcm_decode(vk);
+    [survive_path, bits_hat] = tcm_decode(vk, zp_by);
 else
     bits_hat = qamdemod(vk, M, 'OutputType','bit');
 end

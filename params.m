@@ -13,10 +13,13 @@ coded = 1;
 % Message and System Parameters
 pilotT = 73;
 if coded
-    B = 3;
-    M = 2^B;
-    packetT = 228;
-    messageLen = length(bits)/2;
+    k = 2; % number of input bits for conv enc
+    B = 3; % number of past input bits stored in registers
+    M = 2^B; % number of states
+    packetT = 158;
+
+    zp_by = k*(B+1);
+    messageLen = (length(bits)+zp_by)/k;
 else
     B = 4;            % Bits per symbol
     M = 2^B;          % Symbol order
@@ -29,9 +32,6 @@ timingT = 100;    % Number of symbol periods in the timing preamble
 fsamp = 200;      % Sampling frequency in MHz.  DON'T CHANGE
 N = 50;           % Length of filter in symbol periods. Default is 51
 
-pilotT = 73;
-packetT = 270;
-packetLen = packetT + pilotT;
 if mod(messageLen,packetT) > 0
     num_packets = 1+floor(messageLen/packetT);
 else

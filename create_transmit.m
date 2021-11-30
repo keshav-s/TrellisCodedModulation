@@ -4,7 +4,7 @@ params;
 
 % BPSK mapping to symbols
 if coded
-    xk_symbs = tcm_encode(bits);
+    xk_symbs = tcm_encode(bits, zp_by);
 else
     xk_symbs = bits2symbs(bits, coded, B);
 end
