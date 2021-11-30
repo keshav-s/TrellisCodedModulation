@@ -2,27 +2,43 @@
 
 % Create bits
 rng(0);
+coded = 0;
 
-img_path = ['images/shannon20520.bmp'];
+if coded
+    img_path = ['images/shannon10200.bmp'];
+else
+    img_path = ['images/shannon20520.bmp'];
+end
+
 bits = imread(img_path);
 [h,w] = size(bits);
 bits = bits(:);
 use_one_tap = 0;
-coded = 1;
 
 % Message and System Parameters
-B = 4;            % Bits per symbol
-M = 2^B;          % Symbol order
+pilotT = 73;
+if coded
+    k = 2; % number of input bits for conv enc
+    n = 3; % number of output bits for conv enc
+    B = 3; % number of past i/p bits stored
+    M = 2^B; % number of states
+    packetT = 232;
+
+    zp_by = k*(B+1);
+    messageLen = (length(bits)+zp_by)/k;
+else
+    B = 4;            % Bits per symbol
+    M = 2^B;          % Symbol order
+    packetT = 270;
+    messageLen = length(bits)/B;
+end
+packetLen = packetT + pilotT;
 rolloff = 0.2;    % Rolloff factor for SRRCR pulse
 freqT = 400;      % Number of symbol periods in the frequency preamble
 timingT = 100;    % Number of symbol periods in the timing preamble
 fsamp = 200;      % Sampling frequency in MHz.  DON'T CHANGE
 N = 50;           % Length of filter in symbol periods. Default is 51
-messageLen = length(bits)/B;
 
-pilotT = 73;
-packetT = 270;
-packetLen = packetT + pilotT;
 if mod(messageLen,packetT) > 0
     num_packets = 1+floor(messageLen/packetT);
 else
@@ -35,7 +51,7 @@ w_len = 7; % Number of taps in Practical MMSE-LE filter. Try 5
 b_len  = 5;
 gamma_f = 0.08; % Step-size normalization constant of LMS algorithm. Try 0.01.  
 gamma_b = 0.08; % Step-size normalization constant of LMS algorithm. Try 0.01.  
-num_train_epochs = 10; % Run over the same pilot sequence repeatedly this many times, to use the pilot more comprehensively
+num_train_epochs = 10; % Run over the same pilot sequence repeatedly this many times, 
 mu_scaling = 0.98; % Reduce the mu by this factor each epoch
 f_delay =  3; % let filter predict a **past** symbol for practical feedforward adaptive filtering
 
@@ -57,12 +73,11 @@ freqUp = upsample(freqBits, fs);
 
 % Timing Preamble and Parameters
 timingBits = (rand(timingT*B, 1)) > 0.5;
-timingSymbs = encode_bits(timingBits, B);
-% timingSymbs = (2*timingBits - 1)*sqrt(Ex);
+timingSymbs = bits2symbs(timingBits, coded, B);
 timingUp = upsample(timingSymbs, fs);
 timingSignal = conv(timingUp,pt,'same');
 
 % Pilot
 pilotBits = (randn(pilotT*B, 1)) > 0.5;
-pilotSymbs = encode_bits(pilotBits, B);
+pilotSymbs = bits2symbs(pilotBits, coded, B);
 pilotUp = upsample(pilotSymbs, fs);

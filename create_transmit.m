@@ -3,8 +3,11 @@
 params;
 
 % BPSK mapping to symbols
-xk_symbs = encode_bits(bits, B);
-
+if coded
+    xk_symbs = tcm_encode(bits, zp_by);
+else
+    xk_symbs = bits2symbs(bits, coded, B);
+end
 % Create baseband signal with pilots inserted every packetT symbols
 
 extra = mod(length(xk_symbs),packetT);
@@ -22,7 +25,7 @@ end
 xk_up = upsample(xk_symbs, fs);
 full_xk_up = [freqUp; timingUp; pilotUp; xk_up];
 xt = conv(full_xk_up,pt);
-xt_raw = conv(upsample(encode_bits(bits, B), fs), pt, 'same');
+xt_raw = conv(upsample(bits2symbs(bits, coded, B), fs), pt, 'same');
 xt = xt/(max(abs(xt)));
 lenxt = length(xt);
 

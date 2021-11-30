@@ -31,7 +31,11 @@ end
 
 %% Plot Original and Recovered Images
 % Final recovered bits and image
-bits_hat = qamdemod(vk, M, 'OutputType','bit');
+if coded
+    [survive_path, bits_hat] = tcm_decode(vk, zp_by);
+else
+    bits_hat = qamdemod(vk, M, 'OutputType','bit');
+end
 fprintf('BER: %f\n', sum(bits_hat~=bits)/length(bits));
 fprintf('Number of Incorrect Bits: %d\n', sum(bits_hat ~= bits))
 
