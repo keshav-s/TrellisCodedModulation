@@ -74,7 +74,6 @@ freqUp = upsample(freqBits, fs);
 % Timing Preamble and Parameters
 timingBits = (rand(timingT*B, 1)) > 0.5;
 timingSymbs = bits2symbs(timingBits, coded, B);
-% timingSymbs = (2*timingBits - 1)*sqrt(Ex);
 timingUp = upsample(timingSymbs, fs);
 timingSignal = conv(timingUp,pt,'same');
 
